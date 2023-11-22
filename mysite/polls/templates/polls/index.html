@@ -1,0 +1,28 @@
+{% extends "polls/skeleton.html" %}
+
+{%block content%}
+
+<h2> Answered Polls: </h2>
+
+{% if answered %}
+    {% for answered_question in answered %}
+        <ul> 
+            <li><a href="{% url 'polls:results' answered_question.id %}">{{ answered_question.question_text }}</a></li> 
+        </ul>
+    {% endfor %}
+{% else %}
+    <p>No answered polls are available.</p>
+{% endif %}
+
+<h2> UnAnswered Polls: </h2>
+{% if notAnswered %}
+    {% for notAnswered_question in notAnswered %}
+    <ul>
+        <li><a href="{% url 'polls:detail' notAnswered_question.id%}">{{ notAnswered_question.question_text }}</a></li>
+    </ul>
+    {% endfor %}
+    </ul>
+{% else %}
+   <p> All polls have been taken. </p>
+{% endif %}
+{% endblock %}

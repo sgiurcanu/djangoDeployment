@@ -1,0 +1,18 @@
+{% extends "polls/skeleton.html" %}
+{%block content%}
+<h1>{{ question.question_text }}</h1>
+
+<ul>
+    
+    
+    
+    <li><mark>{{ my_response.choice_text }} -- {{ my_response.num_votes }} vote{{ my_response.num_votes|pluralize }}</mark></li>
+    
+    
+    
+{% for choice in choices%}
+    <li> {{ choice.choice_text }} -- {{ choice.num_votes }} vote{{ choice.num_votes|pluralize }}</li>
+{% endfor %}
+</ul>
+ <a href="{% url 'polls:index' %}">Back</a> 
+{% endblock %}
