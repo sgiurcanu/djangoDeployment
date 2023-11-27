@@ -14,6 +14,8 @@ from datetime import datetime
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
+from django.contrib.auth.models import User
+
 
 
 # def detail(request, question_id):
@@ -90,6 +92,19 @@ class DetailView(LoginRequiredMixin,generic.DetailView):
 #         choice.save()
 #         if vote.objects.filter(question=1, user = request.user).count() == 1:
 #             return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+@login_required
+def detail(request, question_id):
+    
+    question = Question.objects.get(pk=question_id)
+    usersvoted = User.objects.filter(response__choice__question = question_id)
+
+    if request.user in usersvoted:
+        my_response = Choice.objects.filter(question = question_id, response__user = request.user).annotate(num_votes=Count("response")).first()
+        choices = Choice.objects.filter(question_id = question_id).annotate(num_votes=Count("response")).exclude(response__user = request.user)
+
+        return render(request, 'polls/results.html', {'question': question, "my_response": my_response, "choices": choices})    
+    #question = get_object_or_404(Question, pk=question_id)
+    return render(request, 'polls/detail.html', {'question': question})
 
 @login_required
 def results(request,pk):
@@ -115,7 +130,7 @@ def vote(request, question_id):
         try:
             selected_choice = question.choice_set.get(pk=request.POST["choice"])
             Question.objects.filter(choice = selected_choice) # THIS IS when u wanna know the exact chocie someone made if they already voted highlighted part of the assigment *
-            # return HttpResponseRedirect(reverse("polls:results", args = (question.id,)))
+            
         except (KeyError, Choice.DoesNotExist):
             return render(
                 request,
@@ -129,7 +144,7 @@ def vote(request, question_id):
             r = Response(choice = selected_choice , time = datetime.now() , user = request.user) 
             r.save()
             return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
-     
+        
 # def vote(request, question_id):
 #     return HttpResponse("You're voting on question %s." % question_id)
 
